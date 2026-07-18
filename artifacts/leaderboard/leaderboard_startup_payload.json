@@ -1,0 +1,485 @@
+[
+  {
+    "column_widths": [
+      "200px",
+      "88px",
+      "96px",
+      "72px",
+      "68px",
+      "68px",
+      "58px",
+      "62px"
+    ],
+    "value": {
+      "headers": [
+        "Model",
+        "Avg WER (%)",
+        "Near Field Speech",
+        "High SNR",
+        "Mid SNR",
+        "Low SNR",
+        "RTFx",
+        "Params (B)"
+      ],
+      "data": [
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/zhifeixie/Mega-ASR\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">zhifeixie/Mega-ASR</a>",
+          13.38,
+          3.88,
+          7.17,
+          14.05,
+          28.42,
+          19.7833,
+          2.038
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/Qwen/Qwen3-ASR-1.7B\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">Qwen/Qwen3-ASR-1.7B</a>",
+          13.41,
+          3.76,
+          6.74,
+          13.89,
+          29.26,
+          25.7132,
+          2.038
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/CohereLabs/cohere-transcribe-03-2026\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">CohereLabs/cohere-transcribe-03-2026</a>",
+          15.03,
+          4.28,
+          7.79,
+          15.25,
+          32.79,
+          63.2846,
+          2.0
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/ibm-granite/granite-speech-4.1-2b-nar\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">ibm-granite/granite-speech-4.1-2b-nar</a>",
+          15.16,
+          4.07,
+          8.22,
+          16.41,
+          31.95,
+          211.1197,
+          2.255
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/ibm-granite/granite-speech-4.1-2b\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">ibm-granite/granite-speech-4.1-2b</a>",
+          16.35,
+          4.26,
+          8.16,
+          16.35,
+          36.62,
+          21.6332,
+          2.313
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/Qwen/Qwen3-ASR-0.6B\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">Qwen/Qwen3-ASR-0.6B</a>",
+          16.97,
+          4.37,
+          9.59,
+          18.24,
+          35.68,
+          25.5306,
+          0.782
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/parakeet-tdt-1.1b\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/parakeet-tdt-1.1b</a>",
+          17.34,
+          4.17,
+          9.17,
+          18.37,
+          37.63,
+          106.0419,
+          1.07
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/parakeet-tdt-0.6b-v2</a>",
+          17.66,
+          4.2,
+          10.22,
+          19.11,
+          37.11,
+          215.0677,
+          0.618
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/parakeet-tdt-0.6b-v3</a>",
+          19.04,
+          5.1,
+          10.57,
+          20.26,
+          40.23,
+          127.081,
+          0.627
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/AutoArk-AI/ARK-ASR-3B\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">AutoArk-AI/ARK-ASR-3B</a>",
+          19.13,
+          4.34,
+          9.66,
+          21.25,
+          41.27,
+          23.5882,
+          3.086
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/canary-qwen-2.5b\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/canary-qwen-2.5b</a>",
+          19.54,
+          4.89,
+          9.87,
+          20.76,
+          42.65,
+          1.6202,
+          2.559
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/ibm-granite/granite-4.0-1b-speech\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">ibm-granite/granite-4.0-1b-speech</a>",
+          19.65,
+          4.51,
+          10.89,
+          20.87,
+          42.33,
+          22.7215,
+          2.313
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/bosonai/higgs-audio-v3-stt\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">bosonai/higgs-audio-v3-stt</a>",
+          19.71,
+          3.97,
+          10.17,
+          21.72,
+          42.99,
+          6.1982,
+          2.676
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/bosonai/higgs-audio-v3-8b-stt-v2\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">bosonai/higgs-audio-v3-8b-stt-v2</a>",
+          20.54,
+          3.75,
+          8.74,
+          18.84,
+          50.84,
+          4.8264,
+          8.906
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/mistralai/Voxtral-Mini-3B-2507\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">mistralai/Voxtral-Mini-3B-2507</a>",
+          21.58,
+          4.07,
+          10.62,
+          22.94,
+          48.68,
+          18.2236,
+          4.274
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/canary-1b-v2\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/canary-1b-v2</a>",
+          21.62,
+          4.44,
+          10.5,
+          23.04,
+          48.49,
+          45.944,
+          1.0
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/canary-1b-flash\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/canary-1b-flash</a>",
+          24.03,
+          4.29,
+          12.01,
+          26.88,
+          52.93,
+          65.1848,
+          1.0
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/parakeet-ctc-1.1b\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/parakeet-ctc-1.1b</a>",
+          24.56,
+          5.37,
+          15.11,
+          28.11,
+          49.65,
+          227.9919,
+          1.063
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/efficient-speech/lite-whisper-large-v3-turbo-acc\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">efficient-speech/lite-whisper-large-v3-turbo-acc</a>",
+          26.04,
+          4.33,
+          13.33,
+          29.48,
+          57.03,
+          92.5779,
+          0.594
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/espnet/owsm_ctc_v4_1B\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">espnet/owsm_ctc_v4_1B</a>",
+          28.21,
+          8.5,
+          19.86,
+          32.73,
+          51.74,
+          121.0978,
+          1.0
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">mistralai/Voxtral-Mini-4B-Realtime-2602</a>",
+          30.65,
+          4.75,
+          18.83,
+          36.66,
+          62.37,
+          1.2384,
+          4.43
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/speechbrain/asr-conformer-loquacious\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">speechbrain/asr-conformer-loquacious</a>",
+          31.11,
+          9.32,
+          20.55,
+          36.43,
+          58.12,
+          7.0491,
+          0.483
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/GilgameshWind/X-ASR-zh-en\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">GilgameshWind/X-ASR-zh-en</a>",
+          31.5,
+          15.33,
+          20.06,
+          34.98,
+          55.64,
+          15.5683,
+          "NA"
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/stt_en_conformer_ctc_large\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/stt_en_conformer_ctc_large</a>",
+          35.93,
+          8.17,
+          23.93,
+          44.59,
+          67.04,
+          329.5814,
+          0.122
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/efficient-speech/lite-whisper-large-v3-turbo\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">efficient-speech/lite-whisper-large-v3-turbo</a>",
+          36.58,
+          4.67,
+          18.97,
+          43.1,
+          79.56,
+          94.6719,
+          0.547
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/nvidia/stt_en_fastconformer_hybrid_large_streaming_multi\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">nvidia/stt_en_fastconformer_hybrid_large_streaming_multi</a>",
+          47.08,
+          8.46,
+          35.22,
+          63.16,
+          81.47,
+          293.981,
+          0.115
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/UsefulSensors/moonshine-streaming-small\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">UsefulSensors/moonshine-streaming-small</a>",
+          50.25,
+          6.14,
+          34.09,
+          61.2,
+          99.56,
+          34.3052,
+          0.14
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/openai/whisper-base\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">openai/whisper-base</a>",
+          57.52,
+          8.8,
+          34.75,
+          69.46,
+          117.05,
+          16.9546,
+          0.074
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/speechbrain/asr-wav2vec2-librispeech\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">speechbrain/asr-wav2vec2-librispeech</a>",
+          58.2,
+          11.97,
+          49.38,
+          78.81,
+          92.65,
+          294.7178,
+          0.317
+        ],
+        [
+          "<a target=\"_blank\" href=\"https://huggingface.co/openai/whisper-tiny\" style=\"color: var(--link-text-color); text-decoration: underline;text-decoration-style: dotted;\">openai/whisper-tiny</a>",
+          72.32,
+          11.31,
+          52.94,
+          87.58,
+          137.45,
+          28.6912,
+          0.039
+        ]
+      ],
+      "metadata": null
+    },
+    "__type__": "update"
+  },
+  "<div class='next-up-panel' style='font-size:0.9em;opacity:0.85'><p><em>No models are waiting in the evaluation queue.</em></p></div>",
+  {
+    "choices": [
+      [
+        "Latest",
+        ""
+      ],
+      [
+        "2026-07-04 09:41 UTC \u2014 GilgameshWind/X-ASR-zh-en",
+        "2026-07-04T09:41:11.175286Z"
+      ],
+      [
+        "2026-06-29 19:29 UTC \u2014 bosonai/higgs-audio-v3-stt",
+        "2026-06-29T19:29:23.073997Z"
+      ],
+      [
+        "2026-06-29 15:14 UTC \u2014 AutoArk-AI/ARK-ASR-3B",
+        "2026-06-29T15:14:49.145679Z"
+      ],
+      [
+        "2026-06-26 22:29 UTC \u2014 bosonai/higgs-audio-v3-8b-stt-v2",
+        "2026-06-26T22:29:49.088380Z"
+      ],
+      [
+        "2026-06-24 10:20 UTC \u2014 ibm-granite/granite-speech-4.1-2b-nar",
+        "2026-06-24T10:20:58.433917Z"
+      ],
+      [
+        "2026-06-17 06:17 UTC \u2014 mistralai/Voxtral-Mini-4B-Realtime-2602",
+        "2026-06-17T06:17:09.645844Z"
+      ],
+      [
+        "2026-06-15 13:03 UTC \u2014 mistralai/Voxtral-Mini-3B-2507",
+        "2026-06-15T13:03:19.805663Z"
+      ],
+      [
+        "2026-06-15 12:17 UTC \u2014 zhifeixie/Mega-ASR",
+        "2026-06-15T12:17:13.295532Z"
+      ],
+      [
+        "2026-06-15 09:20 UTC \u2014 mistralai/Voxtral-Mini-4B-Realtime-2602",
+        "2026-06-15T09:20:59.072897Z"
+      ],
+      [
+        "2026-06-13 22:15 UTC \u2014 nvidia/canary-qwen-2.5b",
+        "2026-06-13T22:15:39.436872Z"
+      ],
+      [
+        "2026-06-12 15:02 UTC \u2014 zhifeixie/Mega-ASR",
+        "2026-06-12T15:02:08.539020Z"
+      ],
+      [
+        "2026-06-12 14:34 UTC \u2014 Qwen/Qwen3-ASR-0.6B",
+        "2026-06-12T14:34:19.786863Z"
+      ],
+      [
+        "2026-06-12 10:50 UTC \u2014 Qwen/Qwen3-ASR-1.7B",
+        "2026-06-12T10:50:24.956524Z"
+      ],
+      [
+        "2026-06-12 09:20 UTC \u2014 nvidia/parakeet-tdt-1.1b",
+        "2026-06-12T09:20:59.092101Z"
+      ],
+      [
+        "2026-06-12 08:27 UTC \u2014 nvidia/stt_en_fastconformer_hybrid_large_streaming_multi",
+        "2026-06-12T08:27:37.745499Z"
+      ],
+      [
+        "2026-06-09 13:23 UTC \u2014 nvidia/stt_en_conformer_ctc_large",
+        "2026-06-09T13:23:17.685866Z"
+      ],
+      [
+        "2026-06-09 13:02 UTC \u2014 nvidia/canary-1b-v2",
+        "2026-06-09T13:02:05.628278Z"
+      ],
+      [
+        "2026-06-09 12:40 UTC \u2014 nvidia/canary-1b-flash",
+        "2026-06-09T12:40:34.880437Z"
+      ],
+      [
+        "2026-06-08 13:40 UTC \u2014 openai/whisper-base",
+        "2026-06-08T13:40:32.155399Z"
+      ],
+      [
+        "2026-06-08 11:10 UTC \u2014 openai/whisper-tiny",
+        "2026-06-08T11:10:32.296522Z"
+      ],
+      [
+        "2026-06-08 08:31 UTC \u2014 openai/whisper-large",
+        "2026-06-08T08:31:23.213668Z"
+      ],
+      [
+        "2026-06-08 05:09 UTC \u2014 speechbrain/asr-conformer-loquacious",
+        "2026-06-08T05:09:56.349653Z"
+      ],
+      [
+        "2026-06-08 00:14 UTC \u2014 ibm-granite/granite-speech-4.1-2b",
+        "2026-06-08T00:14:16.018134Z"
+      ],
+      [
+        "2026-06-08 00:07 UTC \u2014 ibm-granite/granite-4.0-1b-speech",
+        "2026-06-08T00:07:57.997285Z"
+      ],
+      [
+        "2026-06-07 23:12 UTC \u2014 openai/whisper-base",
+        "2026-06-07T23:12:01.129422Z"
+      ],
+      [
+        "2026-06-07 23:03 UTC \u2014 UsefulSensors/moonshine-streaming-small",
+        "2026-06-07T23:03:15.904070Z"
+      ],
+      [
+        "2026-06-07 22:47 UTC \u2014 openai/whisper-tiny",
+        "2026-06-07T22:47:14.682631Z"
+      ],
+      [
+        "2026-06-07 22:20 UTC \u2014 espnet/owsm_ctc_v4_1B",
+        "2026-06-07T22:20:53.053179Z"
+      ],
+      [
+        "2026-06-07 22:17 UTC \u2014 CohereLabs/cohere-transcribe-03-2026",
+        "2026-06-07T22:17:01.846170Z"
+      ],
+      [
+        "2026-06-07 22:12 UTC \u2014 nvidia/canary-1b-flash",
+        "2026-06-07T22:12:38.576259Z"
+      ],
+      [
+        "2026-06-07 22:00 UTC \u2014 efficient-speech/lite-whisper-large-v3-turbo-acc",
+        "2026-06-07T22:00:33.019138Z"
+      ],
+      [
+        "2026-06-07 22:00 UTC \u2014 efficient-speech/lite-whisper-large-v3-turbo",
+        "2026-06-07T22:00:10.167560Z"
+      ],
+      [
+        "2026-06-07 21:50 UTC \u2014 nvidia/parakeet-tdt-0.6b-v3",
+        "2026-06-07T21:50:39.053087Z"
+      ],
+      [
+        "2026-06-07 21:40 UTC \u2014 nvidia/parakeet-tdt-0.6b-v2",
+        "2026-06-07T21:40:14.936016Z"
+      ],
+      [
+        "2026-06-07 21:39 UTC \u2014 nvidia/parakeet-ctc-1.1b",
+        "2026-06-07T21:39:16.136589Z"
+      ],
+      [
+        "2026-06-07 21:35 UTC \u2014 Initial release",
+        "2026-06-07T21:35:34.654537Z"
+      ]
+    ],
+    "value": "",
+    "__type__": "update"
+  }
+]

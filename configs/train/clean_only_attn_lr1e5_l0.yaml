@@ -1,0 +1,44 @@
+run_id: clean_only_attn_lr1e5_l0
+hypothesis: "With corrected Whisper label prefixes, clean-only encoder-attention LoRA should reduce clean CE without dry WER regression."
+starting_checkpoint: efficient-speech/lite-whisper-large-v3-turbo-acc
+changed_variable: "clean-only training, encoder-attention LoRA, LR 1e-5, corrected label prefix"
+control_run: baseline_mini_proxy dry condition
+promotion_criterion: "Clean CE decreases and dry WER regression is <=0.3 absolute at checkpoints."
+seed: 1337
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+labels:
+  language: en
+  task: transcribe
+  predict_timestamps: false
+train_manifest: artifacts/manifests/librispeech_train_clean_diag/manifest.jsonl
+output_dir: artifacts/runs/clean_only_attn_lr1e5_l0
+max_updates: 50
+max_wall_time_minutes: 20
+micro_batch_size: 1
+grad_accumulation: 8
+learning_rate: 0.00001
+weight_decay: 0.0
+gradient_clip_norm: 1.0
+checkpoint_steps: [5, 10, 25, 50]
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_name_regex:
+    - "model\\.encoder\\.layers\\..*\\.self_attn\\.(q_proj|v_proj|out_proj)$"
+augmentation:
+  condition_distribution:
+    dry: 1.0
+  snr_db:
+    high: [14.0, 25.0]
+    mid: [8.0, 12.0]
+    low: [-3.0, 6.0]
+resources:
+  expected_vram: "10-18 GB"
+  expected_disk_usage: "<0.1 GB adapter/logs/checkpoints"
+  max_project_gb: 48

@@ -1,0 +1,21 @@
+run_id: baseline_tuning_dev_proxy
+hypothesis: "Establish baseline on the new immutable tuning-dev proxy before simulator-calibrated pilots."
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+manifest: artifacts/manifests/proxy/tuning_dev_proxy.jsonl
+output_dir: artifacts/reports/baseline_tuning_dev_proxy
+decoding:
+  max_new_tokens: 128
+  num_beams: 1
+  language: en
+  task: transcribe
+promotion:
+  baseline_dry_wer: null
+  catastrophic_length_ratio_threshold: 2.5
+limits:
+  max_samples:
+  max_project_gb: 48

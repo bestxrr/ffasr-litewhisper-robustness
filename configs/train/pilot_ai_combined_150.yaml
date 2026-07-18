@@ -1,0 +1,69 @@
+run_id: pilot_ai_combined_150
+hypothesis: Combining the SNR floor fix and the effects fix closes the train/eval
+  augmentation mismatch fully and should move mid/low improvement further than either
+  fix alone.
+starting_checkpoint: efficient-speech/lite-whisper-large-v3-turbo-acc
+changed_variable: Pilot X recipe with both the low-condition SNR floor extended to
+  [-3,6] (late stage) and the effects block added to match configs/eval/proxy.yaml.
+control_run: pilot_x_decoder_cross_attn_lr5e6_150, pilot_j_simcal_attn_clean_lam1_l0
+  (effects tested on older recipe), and baseline_tuning_dev_decode_ng3_proxy
+promotion_criterion: Tuning-dev no-repeat-3 Avg improves >=2%, combined mid/low improves
+  >=5% relative, dry regression <=0.7, catastrophic rate does not increase.
+seed: 1337
+model: {id: efficient-speech/lite-whisper-large-v3-turbo-acc, revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66,
+  processor_id: openai/whisper-large-v3, dtype: float16, device: cuda}
+labels: {language: en, task: transcribe, predict_timestamps: false}
+train_manifest: artifacts/manifests/librispeech_train_clean_diag/manifest.jsonl
+output_dir: artifacts/runs/pilot_ai_combined_150
+max_updates: 150
+max_wall_time_minutes: 45
+micro_batch_size: 1
+grad_accumulation: 8
+learning_rate: 5.0e-06
+weight_decay: 0.0
+gradient_clip_norm: 1.0
+checkpoint_steps: [75, 100, 150]
+loss: {clean_ce_weight: 1.0, normalize_clean_anchor: true}
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_name_regex: [model\.encoder\.layers\..*\.self_attn\.(q_proj|v_proj|out_proj)$,
+    model\.decoder\.layers\..*\.encoder_attn\.(q_proj|v_proj|out_proj)$]
+augmentation:
+  condition_distribution: {dry: 0.35, high: 0.35, mid: 0.2, low: 0.1}
+  snr_db:
+    high: [16.0, 25.0]
+    mid: [10.0, 14.0]
+    low: [1.0, 8.0]
+  curriculum:
+  - until_update: 50
+    condition_distribution: {dry: 0.35, high: 0.35, mid: 0.2, low: 0.1}
+    snr_db:
+      high: [16.0, 25.0]
+      mid: [10.0, 14.0]
+      low: [1.0, 8.0]
+    effects: &id001
+      spectral_probability: {high: 0.15, mid: 0.35, low: 0.55}
+      spectral_types:
+        high: [highpass, bandpass, lowpass]
+        mid: [bandpass, lowpass, highpass]
+        low: [bandpass, lowpass, highpass]
+      spectral_ranges:
+        lowpass: [2800, 7200]
+        highpass: [50, 220]
+        bandpass_low: [80, 250]
+        bandpass_high: [3000, 7600]
+      clipping_probability: {high: 0.02, mid: 0.08, low: 0.18}
+      clipping_drive_db: [1.0, 7.0]
+      dropout_probability: {low: 0.08}
+      dropout_max_ms: 80
+  - until_update: null
+    condition_distribution: {dry: 0.25, high: 0.25, mid: 0.3, low: 0.2}
+    snr_db:
+      high: [14.0, 25.0]
+      mid: [8.0, 13.0]
+      low: [-3.0, 6.0]
+    effects: *id001
+  effects: *id001
+resources: {expected_vram: 12-20 GB, expected_disk_usage: <0.3 GB adapter/logs, max_project_gb: 48}

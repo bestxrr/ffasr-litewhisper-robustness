@@ -1,0 +1,28 @@
+run_id: clean_only_attn_lr1e5_u25_loss64
+hypothesis: Fixed 64-utterance clean teacher-forced CE evaluation.
+changed_variable: artifacts/runs/clean_only_attn_lr1e5_l0/adapter_update_25.safetensors
+control_run: base_clean_loss64
+promotion_criterion: clean CE should decrease versus base for clean-only sanity
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+labels:
+  language: en
+  task: transcribe
+  predict_timestamps: false
+manifest: artifacts/manifests/librispeech_train_clean_diag/fixed_loss64.jsonl
+output_dir: artifacts/reports/clean_only_attn_lr1e5_u25_loss64
+limits:
+  max_samples: null
+  max_project_gb: 48
+adapter:
+  path: artifacts/runs/clean_only_attn_lr1e5_l0/adapter_update_25.safetensors
+  lora:
+    rank: 16
+    alpha: 32
+    dropout: 0.0
+    target_name_regex:
+    - model\.encoder\.layers\..*\.self_attn\.(q_proj|v_proj|out_proj)$

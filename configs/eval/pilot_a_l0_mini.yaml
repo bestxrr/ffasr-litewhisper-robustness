@@ -1,0 +1,32 @@
+run_id: pilot_a_l0_mini_proxy
+hypothesis: "Evaluate Level-0 encoder-attention LoRA Pilot A on the immutable mini-proxy."
+changed_variable: "adapter=artifacts/runs/pilot_a_encoder_attn_l0/adapter.safetensors"
+control_run: baseline_mini_proxy
+promotion_criterion: "Compare promotion score, mid/low relative WER, dry regression, and catastrophic rate against baseline mini-proxy and Pilot B."
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+adapter:
+  path: artifacts/runs/pilot_a_encoder_attn_l0/adapter.safetensors
+  lora:
+    rank: 16
+    alpha: 32
+    dropout: 0.0
+    target_name_regex:
+      - "model\\.encoder\\.layers\\..*\\.self_attn\\.(q_proj|v_proj|out_proj)$"
+manifest: artifacts/manifests/proxy/mini_proxy.jsonl
+output_dir: artifacts/reports/pilot_a_l0_mini_proxy
+decoding:
+  max_new_tokens: 128
+  num_beams: 1
+  language: en
+  task: transcribe
+promotion:
+  baseline_dry_wer: 1.8181818181818181
+  catastrophic_length_ratio_threshold: 2.5
+limits:
+  max_samples:
+  max_project_gb: 48

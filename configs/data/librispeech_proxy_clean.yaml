@@ -1,0 +1,16 @@
+dataset:
+  hf_id: openslr/librispeech_asr
+  name: clean
+  split: validation
+  streaming: false
+  max_items: 2200
+  trust_remote_code: true
+output:
+  root: artifacts/manifests/librispeech_proxy_clean
+  audio_dir: audio
+  manifest: manifest.jsonl
+selection:
+  min_seconds: 1.0
+  max_seconds: 30.0
+  speaker_disjoint: false
+license_note: "LibriSpeech is derived from LibriVox public domain audiobooks; validation split is used only for proxy evaluation, not training."

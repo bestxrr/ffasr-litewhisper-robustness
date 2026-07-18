@@ -1,0 +1,16 @@
+dataset:
+  hf_id: openslr/librispeech_asr
+  name: clean
+  split: train.clean.100
+  streaming: true
+  max_items: 12000
+  trust_remote_code: false
+output:
+  root: artifacts/manifests/librispeech_bounded
+  audio_dir: audio
+  manifest: manifest.jsonl
+selection:
+  min_seconds: 1.0
+  max_seconds: 30.0
+  speaker_disjoint: true
+license_note: "LibriSpeech is derived from LibriVox public domain audiobooks; verify upstream license before large-scale use."

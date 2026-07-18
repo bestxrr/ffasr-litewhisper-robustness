@@ -1,0 +1,38 @@
+# secrets
+.env
+*.env
+!requirements.txt
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.ipynb_checkpoints/
+
+# caches
+.cache/
+.hf_home/
+
+# vendored external repos (each is its own git repo; see docs/REPRODUCE.md to fetch)
+external/
+
+# large / regenerable data and run artifacts (see docs/REPRODUCE.md to regenerate)
+artifacts/manifests/
+artifacts/reports/
+artifacts/wandb/
+artifacts/submissions/
+artifacts/runs/*/
+artifacts_ffasr_config.json
+
+wandb/
+
+# instance-specific agent guide symlinks (not project content)
+AGENTS.md
+CLAUDE.md
+
+# unrelated repo living alongside this project on the instance
+/lfm-serving/
+
+# venv backup snapshots (instance-local, not project content)
+/.venv-backups/

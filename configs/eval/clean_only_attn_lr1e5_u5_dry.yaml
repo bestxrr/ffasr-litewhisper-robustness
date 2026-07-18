@@ -1,0 +1,32 @@
+run_id: clean_only_attn_lr1e5_u5_dry_proxy
+hypothesis: Evaluate clean-only checkpoint update 5 on dry mini-proxy.
+changed_variable: adapter=artifacts/runs/clean_only_attn_lr1e5_l0/adapter_update_5.safetensors
+control_run: baseline_mini_proxy dry condition
+promotion_criterion: Dry WER regression <=0.3 absolute and no catastrophic increase.
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+adapter:
+  path: artifacts/runs/clean_only_attn_lr1e5_l0/adapter_update_5.safetensors
+  lora:
+    rank: 16
+    alpha: 32
+    dropout: 0.0
+    target_name_regex:
+    - model\.encoder\.layers\..*\.self_attn\.(q_proj|v_proj|out_proj)$
+manifest: artifacts/manifests/proxy/mini_proxy_dry.jsonl
+output_dir: artifacts/reports/clean_only_attn_lr1e5_u5_dry_proxy
+decoding:
+  max_new_tokens: 128
+  num_beams: 1
+  language: en
+  task: transcribe
+promotion:
+  baseline_dry_wer: 1.8181818181818181
+  catastrophic_length_ratio_threshold: 2.5
+limits:
+  max_samples: null
+  max_project_gb: 48

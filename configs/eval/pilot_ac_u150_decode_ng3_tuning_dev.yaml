@@ -1,0 +1,34 @@
+run_id: pilot_ac_u150_decode_ng3_tuning_dev_proxy
+hypothesis: "Pilot AC u150 tests the full dropout-regularized decoder-cross pilot."
+changed_variable: "adapter=Pilot AC u150 with no_repeat_ngram_size=3"
+control_run: baseline_tuning_dev_decode_ng3_proxy and pilot_x_u150_decode_ng3_tuning_dev_proxy
+promotion_criterion: "Against no-repeat-3 baseline: Avg improves >=2%, mid/low improves >=5% relative, dry regression <=0.7, catastrophic rate does not increase."
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+adapter:
+  path: artifacts/runs/pilot_ac_decoder_cross_dropout10_150/adapter.safetensors
+  lora:
+    rank: 16
+    alpha: 32
+    dropout: 0.0
+    target_name_regex:
+      - "model\\.encoder\\.layers\\..*\\.self_attn\\.(q_proj|v_proj|out_proj)$"
+      - "model\\.decoder\\.layers\\..*\\.encoder_attn\\.(q_proj|v_proj|out_proj)$"
+manifest: artifacts/manifests/proxy/tuning_dev_proxy.jsonl
+output_dir: artifacts/reports/pilot_ac_u150_decode_ng3_tuning_dev_proxy
+decoding:
+  max_new_tokens: 128
+  num_beams: 1
+  language: en
+  task: transcribe
+  no_repeat_ngram_size: 3
+promotion:
+  baseline_dry_wer:
+  catastrophic_length_ratio_threshold: 2.5
+limits:
+  max_samples:
+  max_project_gb: 48

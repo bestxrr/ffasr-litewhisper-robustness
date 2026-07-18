@@ -1,0 +1,43 @@
+run_id: pilot_b_encoder_attn_ffn_l0
+hypothesis: "Adding encoder FFN output LoRA improves acoustic adaptation over attention-only at the same update budget."
+starting_checkpoint: efficient-speech/lite-whisper-large-v3-turbo-acc
+changed_variable: "LoRA target set: encoder self-attention q/v/out plus encoder fc2"
+control_run: pilot_a_encoder_attn_l0
+promotion_criterion: "Stable loss/gradients and better mini-proxy promotion score than Pilot A."
+seed: 1337
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+train_manifest: artifacts/manifests/librispeech_train_clean_l0/manifest.jsonl
+output_dir: artifacts/runs/pilot_b_encoder_attn_ffn_l0
+max_updates: 50
+max_wall_time_minutes: 15
+micro_batch_size: 1
+grad_accumulation: 8
+learning_rate: 0.00005
+weight_decay: 0.0
+gradient_clip_norm: 1.0
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_name_regex:
+    - "model\\.encoder\\.layers\\..*\\.self_attn\\.(q_proj|v_proj|out_proj)$"
+    - "model\\.encoder\\.layers\\..*\\.fc2$"
+augmentation:
+  condition_distribution:
+    dry: 0.30
+    high: 0.30
+    mid: 0.20
+    low: 0.20
+  snr_db:
+    high: [14.0, 25.0]
+    mid: [8.0, 12.0]
+    low: [-3.0, 6.0]
+resources:
+  expected_vram: "12-20 GB"
+  expected_disk_usage: "<0.15 GB adapter/logs"
+  max_project_gb: 48

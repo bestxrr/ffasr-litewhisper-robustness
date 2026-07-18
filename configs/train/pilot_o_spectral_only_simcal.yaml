@@ -1,0 +1,140 @@
+run_id: pilot_o_spectral_only_simcal
+hypothesis: "Spectral-only simulator calibration will preserve mid/low substitution gains without the low insertion drift seen when clipping is included."
+starting_checkpoint: efficient-speech/lite-whisper-large-v3-turbo-acc
+changed_variable: "simulator severity only: spectral filtering retained, clipping and frame dropout disabled"
+control_run: baseline_tuning_dev_proxy, pilot_j_simcal_attn_clean_lam1_l0, and pilot_n_deletion_safe_simcal
+promotion_criterion: "Tuning-dev Avg improves >=2%, combined mid/low improves >=5% relative, dry regression <=0.7, catastrophic rate does not increase."
+seed: 1337
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+labels:
+  language: en
+  task: transcribe
+  predict_timestamps: false
+train_manifest: artifacts/manifests/librispeech_train_clean_diag/manifest.jsonl
+output_dir: artifacts/runs/pilot_o_spectral_only_simcal
+max_updates: 100
+checkpoint_steps: [50, 100]
+max_wall_time_minutes: 25
+micro_batch_size: 1
+grad_accumulation: 8
+learning_rate: 0.00001
+weight_decay: 0.0
+gradient_clip_norm: 1.0
+loss:
+  clean_ce_weight: 1.0
+  normalize_clean_anchor: true
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_name_regex:
+    - "model\\.encoder\\.layers\\..*\\.self_attn\\.(q_proj|v_proj|out_proj)$"
+augmentation:
+  condition_distribution:
+    dry: 0.30
+    high: 0.25
+    mid: 0.25
+    low: 0.20
+  snr_db:
+    high: [15.0, 25.0]
+    mid: [9.0, 13.0]
+    low: [2.0, 8.0]
+  effects:
+    spectral_probability:
+      high: 0.10
+      mid: 0.30
+      low: 0.45
+    spectral_types:
+      high: [highpass, bandpass, lowpass]
+      mid: [bandpass, lowpass, highpass]
+      low: [bandpass, lowpass, highpass]
+    spectral_ranges:
+      lowpass: [3200, 7600]
+      highpass: [40, 180]
+      bandpass_low: [70, 220]
+      bandpass_high: [3400, 7800]
+    clipping_probability:
+      high: 0.00
+      mid: 0.00
+      low: 0.00
+    clipping_drive_db: [0.0, 0.0]
+    dropout_probability:
+      mid: 0.00
+      low: 0.00
+    dropout_max_ms: 0
+  curriculum:
+    - until_update: 50
+      condition_distribution:
+        dry: 0.30
+        high: 0.25
+        mid: 0.25
+        low: 0.20
+      snr_db:
+        high: [15.0, 25.0]
+        mid: [9.0, 13.0]
+        low: [2.0, 8.0]
+      effects:
+        spectral_probability:
+          high: 0.10
+          mid: 0.30
+          low: 0.45
+        spectral_types:
+          high: [highpass, bandpass, lowpass]
+          mid: [bandpass, lowpass, highpass]
+          low: [bandpass, lowpass, highpass]
+        spectral_ranges:
+          lowpass: [3200, 7600]
+          highpass: [40, 180]
+          bandpass_low: [70, 220]
+          bandpass_high: [3400, 7800]
+        clipping_probability:
+          high: 0.00
+          mid: 0.00
+          low: 0.00
+        clipping_drive_db: [0.0, 0.0]
+        dropout_probability:
+          mid: 0.00
+          low: 0.00
+        dropout_max_ms: 0
+    - until_update:
+      condition_distribution:
+        dry: 0.25
+        high: 0.20
+        mid: 0.30
+        low: 0.25
+      snr_db:
+        high: [15.0, 25.0]
+        mid: [8.5, 13.0]
+        low: [1.0, 7.0]
+      effects:
+        spectral_probability:
+          high: 0.12
+          mid: 0.35
+          low: 0.50
+        spectral_types:
+          high: [highpass, bandpass, lowpass]
+          mid: [bandpass, lowpass, highpass]
+          low: [bandpass, lowpass, highpass]
+        spectral_ranges:
+          lowpass: [3200, 7600]
+          highpass: [40, 180]
+          bandpass_low: [70, 220]
+          bandpass_high: [3400, 7800]
+        clipping_probability:
+          high: 0.00
+          mid: 0.00
+          low: 0.00
+        clipping_drive_db: [0.0, 0.0]
+        dropout_probability:
+          mid: 0.00
+          low: 0.00
+        dropout_max_ms: 0
+resources:
+  expected_vram: "12-20 GB"
+  expected_disk_usage: "<0.2 GB adapter/logs"
+  max_project_gb: 48

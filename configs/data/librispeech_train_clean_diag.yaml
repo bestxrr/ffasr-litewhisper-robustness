@@ -1,0 +1,14 @@
+repo_id: openslr/librispeech_asr
+repo_type: dataset
+files:
+  - clean/train.100/0000.parquet
+  - clean/train.100/0001.parquet
+max_items: 2400
+output:
+  root: artifacts/manifests/librispeech_train_clean_diag
+  audio_dir: audio
+  manifest: manifest.jsonl
+selection:
+  min_seconds: 1.0
+  max_seconds: 30.0
+license_note: "Bounded LibriSpeech train-clean-100 shards 0000-0001; diagnostic training pool, disjoint from validation-clean proxy."

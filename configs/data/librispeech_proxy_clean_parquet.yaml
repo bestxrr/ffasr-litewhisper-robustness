@@ -1,0 +1,13 @@
+repo_id: openslr/librispeech_asr
+repo_type: dataset
+files:
+  - clean/validation/0000.parquet
+max_items: 2200
+output:
+  root: artifacts/manifests/librispeech_proxy_clean
+  audio_dir: audio
+  manifest: manifest.jsonl
+selection:
+  min_seconds: 1.0
+  max_seconds: 30.0
+license_note: "LibriSpeech validation-clean via direct Parquet shard; used only for proxy evaluation."

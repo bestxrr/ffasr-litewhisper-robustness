@@ -1,0 +1,27 @@
+sample_rate: 16000
+seed: 1337
+condition_distribution:
+  dry: 0.20
+  high: 0.15
+  mid: 0.30
+  low: 0.35
+snr_db:
+  high: [14.0, 25.0]
+  mid: [8.0, 12.0]
+  low: [-3.0, 6.0]
+effects:
+  rir:
+    enabled: true
+    rt60_range: [0.2, 1.3]
+  spectral:
+    enabled: true
+    lowpass_hz: [2600, 7600]
+    highpass_hz: [40, 220]
+  clipping:
+    enabled: true
+    probability: 0.15
+    drive_db: [1.0, 8.0]
+  dropout:
+    enabled: true
+    probability: 0.05
+    max_ms: 80

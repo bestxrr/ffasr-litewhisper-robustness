@@ -1,0 +1,9 @@
+space_url: https://treble-technologies-ffasr.hf.space
+space_repo: treble-technologies/ffasr
+default_columns:
+  - Near Field Speech
+  - High SNR
+  - Mid SNR
+  - Low SNR
+normalization: whisper_english
+ranking_metric: average_wer_percent_default_columns

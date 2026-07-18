@@ -1,0 +1,35 @@
+seed: 20260718
+source_manifest: artifacts/manifests/librispeech_tuning_dev_clean/manifest.jsonl
+full_proxy_manifest: artifacts/manifests/proxy/tuning_dev_proxy.jsonl
+mini_proxy_manifest: artifacts/manifests/proxy/tuning_dev_proxy_mini_preview.jsonl
+counts:
+  full_per_condition: 150
+  mini_per_condition: 25
+conditions:
+  - dry
+  - high
+  - mid
+  - low
+snr_db:
+  high: [14.0, 25.0]
+  mid: [8.0, 12.0]
+  low: [-3.0, 6.0]
+rir:
+  enabled_for:
+    - high
+    - mid
+    - low
+  rt60_range: [0.2, 1.1]
+  distance_m_range: [0.8, 6.0]
+  room_volume_m3_range: [20.0, 470.0]
+effects:
+  spectral_probability:
+    high: 0.15
+    mid: 0.35
+    low: 0.55
+  clipping_probability:
+    high: 0.02
+    mid: 0.08
+    low: 0.18
+catastrophic:
+  length_ratio_threshold: 2.5

@@ -1,0 +1,16 @@
+dataset:
+  hf_id: hf-internal-testing/librispeech_asr_dummy
+  name: clean
+  split: validation
+  streaming: true
+  max_items: 4
+  trust_remote_code: false
+output:
+  root: artifacts/manifests/librispeech_smoke
+  audio_dir: audio
+  manifest: manifest.jsonl
+selection:
+  min_seconds: 1.0
+  max_seconds: 30.0
+  speaker_disjoint: false
+license_note: "LibriSpeech is derived from LibriVox public domain audiobooks; verify upstream license before large-scale use."

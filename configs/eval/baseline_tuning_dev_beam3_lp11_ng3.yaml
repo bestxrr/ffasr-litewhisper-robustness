@@ -1,0 +1,26 @@
+run_id: baseline_tuning_dev_beam3_lp11_ng3_proxy
+hypothesis: "Beam-3 with mild length penalty tests whether low-condition deletion behavior is decoder-sensitive."
+changed_variable: "decoding only: num_beams=3, length_penalty=1.1, no_repeat_ngram_size=3"
+control_run: baseline_tuning_dev_decode_ng3_proxy
+promotion_criterion: "Diagnostic control only; candidates must compare against this exact decoder baseline."
+model:
+  id: efficient-speech/lite-whisper-large-v3-turbo-acc
+  revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+  processor_id: openai/whisper-large-v3
+  dtype: float16
+  device: cuda
+manifest: artifacts/manifests/proxy/tuning_dev_proxy.jsonl
+output_dir: artifacts/reports/baseline_tuning_dev_beam3_lp11_ng3_proxy
+decoding:
+  max_new_tokens: 128
+  num_beams: 3
+  language: en
+  task: transcribe
+  no_repeat_ngram_size: 3
+  length_penalty: 1.1
+promotion:
+  baseline_dry_wer:
+  catastrophic_length_ratio_threshold: 2.5
+limits:
+  max_samples:
+  max_project_gb: 48

@@ -1,0 +1,27 @@
+run_id: sft_encoder_lora_e1
+seed: 1337
+base_model: efficient-speech/lite-whisper-large-v3-turbo-acc
+model_revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66
+precision: fp16
+max_steps: 1000
+max_wall_clock_minutes: 170
+gradient_checkpointing: true
+optimizer:
+  name: adamw
+  lr: 0.0001
+  weight_decay: 0.01
+  betas: [0.9, 0.98]
+batching:
+  micro_batch_size: 1
+  grad_accumulation: 16
+  max_audio_seconds: 30
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_name_regex:
+    - "encoder.*self_attn.*(q_proj|v_proj|out_proj)$"
+logging:
+  eval_every_steps: 100
+  save_every_steps: 250
+  keep_checkpoints: 2

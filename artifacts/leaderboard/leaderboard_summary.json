@@ -1,0 +1,66 @@
+{
+  "retrieved_utc": "2026-07-17T03:53:03Z",
+  "num_entries": 30,
+  "top5_threshold": {
+    "rank": 5,
+    "model": "ibm-granite/granite-speech-4.1-2b",
+    "avg_wer": 16.35
+  },
+  "top7_threshold": {
+    "rank": 7,
+    "model": "nvidia/parakeet-tdt-1.1b",
+    "avg_wer": 17.34
+  },
+  "top_entries": [
+    {
+      "rank": 1,
+      "model": "zhifeixie/Mega-ASR",
+      "avg_wer": 13.38
+    },
+    {
+      "rank": 2,
+      "model": "Qwen/Qwen3-ASR-1.7B",
+      "avg_wer": 13.41
+    },
+    {
+      "rank": 3,
+      "model": "CohereLabs/cohere-transcribe-03-2026",
+      "avg_wer": 15.03
+    },
+    {
+      "rank": 4,
+      "model": "ibm-granite/granite-speech-4.1-2b-nar",
+      "avg_wer": 15.16
+    },
+    {
+      "rank": 5,
+      "model": "ibm-granite/granite-speech-4.1-2b",
+      "avg_wer": 16.35
+    },
+    {
+      "rank": 6,
+      "model": "Qwen/Qwen3-ASR-0.6B",
+      "avg_wer": 16.97
+    },
+    {
+      "rank": 7,
+      "model": "nvidia/parakeet-tdt-1.1b",
+      "avg_wer": 17.34
+    },
+    {
+      "rank": 8,
+      "model": "nvidia/parakeet-tdt-0.6b-v2",
+      "avg_wer": 17.66
+    },
+    {
+      "rank": 9,
+      "model": "nvidia/parakeet-tdt-0.6b-v3",
+      "avg_wer": 19.04
+    },
+    {
+      "rank": 10,
+      "model": "AutoArk-AI/ARK-ASR-3B",
+      "avg_wer": 19.13
+    }
+  ]
+}

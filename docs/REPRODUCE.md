@@ -158,7 +158,17 @@ processor. The exact recipe and LoRA config are in
 python -m pytest tests/ -q
 ```
 
-## 9. Current status / where to pick up
+## 9. Next step: scaling the data (H100 run)
+
+The single documented next step is scaling the training data — see
+**`docs/DATA_PLAN.md`** for the full plan (grounded in the leaderboard rank-1
+model's data recipe). Short version: the recipe has plateaued because the 2400-
+utterance / 22-speaker pool is too small (adding capacity overfits, per Pilot AK),
+so the highest-leverage move is to retrain Pilot X's exact recipe on much more
+LibriSpeech (train-clean-360 / full 960h) on a box without this instance's
+48GB-disk / 24GB-VRAM caps, then add difficulty filtering and real RIR/noise.
+
+## 10. Current status / where to pick up
 
 Read `docs/DECISIONS.md` bottom-to-top for the most recent closing rationale.
 As of the last entry: **11+ single-variable pilots** (LR, dropout, training

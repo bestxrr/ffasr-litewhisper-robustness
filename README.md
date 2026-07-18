@@ -26,6 +26,7 @@ rationale and what's left to try.
 | `docs/DECISIONS.md` | promotion/reject decisions and reasoning, chronological |
 | `docs/ERROR_ANALYSIS.md` | paired substitution/deletion/insertion analysis per pilot |
 | `docs/REPRODUCE.md` | how to reproduce any of the above on a fresh server |
+| `docs/DATA_PLAN.md` | **next step**: the data-scaling plan for a larger (H100) run, grounded in the leaderboard rank-1 model's data recipe |
 | `artifacts/runs/experiment_registry.jsonl` | machine-readable log of every pilot (one JSON object per line) |
 
 ## Quick start

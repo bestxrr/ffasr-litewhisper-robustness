@@ -519,3 +519,35 @@ Ran 3 parallel training jobs fixing these on top of Pilot X's exact recipe:
 Resources: 150 updates, 1079.2 s training wall time per job (parallel), peak train VRAM 1.43 GB per job, project disk 23.94 GB.
 
 Decision: reject Pilot AI. The mismatches are real and worth fixing for production training, but closing them does not cross Pilot X on the current 150-update budget -- all three land 0.9-1.2 points below X on mid/low improvement. Augmentation-severity mismatch is ruled out as the primary blocker for this recipe. Pilot X u150 remains the best result overall.
+
+## 2026-07-18 09:30:00 UTC - Pilot AJ/AK/AJK: attack the acoustic bottleneck (parallel run)
+
+Error-driven diagnosis first. Pilot X's residual low-condition WER scales monotonically with the physical difficulty of each sample:
+
+| slice | mean low-condition WER |
+| --- | ---: |
+| SNR < 0dB (n=43) | 48.2 |
+| SNR 0-3dB (n=62) | 36.5 |
+| SNR 3-6dB (n=45) | 24.6 |
+| reverb rt60 > 0.8 (n=43) | 47.0 |
+| reverb rt60 < 0.5 (n=59) | 28.3 |
+
+That signature (plus the zero-sum substitution<->deletion trade seen in AC/AE) says the encoder representation of hard samples lacks acoustic information. Two levers were tried in parallel, both new code in `src/training/sft.py`:
+
+- **AJ** — per-frame clean->degraded encoder feature distillation (`feature_distill_weight=1.0`, gated to high/mid/low): a proper version of Pilot Q's coarse pooled-mean consistency.
+- **AK** — add encoder FFN (`fc1`/`fc2`) to the LoRA target set (1.72M -> 4.08M trainable): capacity to reshape features, not just reweight them.
+- **AJK** — both.
+
+| run | avg | dry | mid/low rel improvement | avg rel improvement | dry regression | catastrophic % | gate |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Pilot X u150 (control) | 14.00 | 2.11 | 3.86% | 2.70% | +0.07 | 0.83 | fail |
+| Pilot AJ u100 | 14.17 | 2.11 | 2.12% | 1.49% | +0.07 | 0.83 | fail |
+| Pilot AJ u150 | 13.99 | 2.07 | 3.86% | 2.74% | +0.03 | 1.17 | fail (ties X) |
+| Pilot AK u75 | 14.49 | 2.84 | 2.44% | -0.70% | +0.80 | 0.83 | fail |
+| Pilot AK u150 | 17.92 | 4.71 | -14.6% | -24.6% | +2.67 | 1.00 | fail (overfit) |
+| Pilot AJK u75 | 14.44 | 2.84 | 2.25% | -0.40% | +0.80 | 0.83 | fail |
+| Pilot AJK u150 | 18.56 | 4.98 | -19.0% | -29.0% | +2.94 | 1.17 | fail (overfit) |
+
+Encoder-FFN capacity (AK/AJK) overfits catastrophically -- training CE drops well below X (0.68 vs 0.84) but proxy WER blows up to 17.9/18.6 with dry regressing +2.7/+2.9, refuting the "capacity-limited" hypothesis. Feature distillation (AJ) is neutral: it ties X almost exactly (low S/D/I 798/118/125 vs X's 800/119/116) and slightly worsens catastrophic rate.
+
+Decision: reject all three. This is the strongest evidence yet that the ceiling is **training-data scale**, not the recipe -- more capacity memorizes the tiny 2400-utterance / 22-speaker / 8.6h pool, and a better clean-target signal changes nothing. See docs/DECISIONS.md for the closing rationale and the recommended data-acquisition next step.

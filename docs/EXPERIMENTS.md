@@ -513,3 +513,23 @@ Best (u150) result per run against `baseline_tuning_dev_decode_ng3_proxy`:
 | Pilot AI combined | 14.12 | 2.70% | 0.83 | reject |
 
 Conclusion: closing the identified train/eval augmentation gaps does not cross Pilot X -- if anything it costs 0.9-1.2 points of mid/low improvement at the same 150-update budget (plausibly because harder augmentation needs more updates to converge, untested here, or because LoRA capacity is the real ceiling). This rules out augmentation-severity mismatch as the primary blocker on this recipe. The gaps are still worth fixing for any eventual production run, but they are not this branch's answer. Closes the data-source review requested by the user.
+
+## 2026-07-18 09:30:00 UTC - Pilot AJ/AK/AJK acoustic-bottleneck levers (parallel)
+
+- Code change: `src/training/sft.py` gained `frame_distillation_loss()`, `encoder_valid_frames()`, a `loss_for_audio` refactor to a `(loss, extras_dict)` return with a `want=(...)` selector, and `loss.feature_distill_weight` / `loss.feature_distill_conditions` knobs. Per-frame cosine distillation reuses the existing clean-anchor forward pass (no extra forward).
+- 3 training+eval jobs in parallel on one GPU:
+  - `configs/train/pilot_aj_featdistill_150.yaml` -- feature_distill_weight=1.0, gated high/mid/low.
+  - `configs/train/pilot_ak_encffn_150.yaml` -- encoder fc1/fc2 added to LoRA targets (1.72M->4.08M trainable).
+  - `configs/train/pilot_ajk_combined_150.yaml` -- both.
+  - Each followed by evaluate_proxy.sh on u75/u100/u150 (AK/AJK eval configs carry the expanded target regex so the adapter attaches before load).
+
+Best (or most informative) checkpoint per run vs `baseline_tuning_dev_decode_ng3_proxy`:
+
+| run | avg | mid/low rel improvement | catastrophic % | note |
+| --- | ---: | ---: | ---: | --- |
+| Pilot X (control) | 14.00 | 3.86% | 0.83 | best so far |
+| Pilot AJ u150 | 13.99 | 3.86% | 1.17 | ties X, neutral |
+| Pilot AK u150 | 17.92 | -14.6% | 1.00 | overfit |
+| Pilot AJK u150 | 18.56 | -19.0% | 1.17 | overfit |
+
+Conclusion: encoder-FFN capacity overfits the small training pool (refutes capacity-limited hypothesis); per-frame distillation is neutral (the LoRA target set can't reshape encoder features enough to help). The acoustic bottleneck is real but data-scale-bound, not recipe-bound. Recommend real/more degraded training data as the next lever, scoped with the user.

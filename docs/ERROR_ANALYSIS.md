@@ -455,3 +455,19 @@ Pilot AE u150 vs no-repeat baseline:
 - Low delta_s/d/i: **+15/-18/-3** (mean delta -0.57).
 
 Interpretation: this is the first pilot in the branch where the low-condition delta_d flips negative (-18, i.e. deletions actually fall versus the no-repeat baseline, unlike every prior pilot which showed deletions rising as substitutions/insertions fell). This confirms the EOS-suppression hypothesis was correctly targeted at the deletion mechanism. But the trade is now inverted: recovered positions are filled with the wrong word (delta_s +15) rather than the right one, so net low WER improvement is smaller than Pilot X's. The finding narrows the remaining problem further: the blocker is not just "when to stop" but "what acoustic evidence to trust under degradation" — fixing the stopping bias alone surfaces a separate substitution weakness. A follow-up should use a much smaller eos_suppress_weight (current 25.0 likely over-corrects) or gate the term to low/mid conditions only so it does not compete with the acoustic CE signal on dry/high samples.
+
+## 2026-07-18 09:30:00 UTC - Pilot AJ/AK/AJK acoustic-bottleneck error analysis
+
+Diagnosis that motivated the pilot (from slicing Pilot X u150 errors.csv):
+
+- Low-condition WER by SNR: 48.2 (<0dB, n=43), 36.5 (0-3dB, n=62), 24.6 (3-6dB, n=45).
+- Low-condition WER by reverb rt60: 28.3 (<0.5, n=59), 36.5 (0.5-0.8, n=48), 47.0 (>0.8, n=43).
+- Monotonic in both physical difficulty axes; dry condition near-perfect (2.11). Signature of an acoustic-frontend (encoder) limit, not a decoder/LM limit.
+
+Post-pilot error structure (low condition S/D/I, vs no-repeat baseline 817/112/140):
+
+- Pilot X u150:  800/119/116.
+- Pilot AJ u150: 798/118/125 (distillation w=1.0) -- essentially unchanged; -2 subs, -1 del, +9 ins.
+- Pilot AK u150 (encoder FFN): error structure collapses (avg WER 17.92, dry 4.71) -- overfit, not a controlled S/D/I shift.
+
+Interpretation: the per-frame clean-target distillation signal ran on every degraded step (mean term 0.22-0.24) yet moved the low-condition S/D/I by single digits -- the current LoRA target set (encoder self-attn + decoder cross-attn) simply cannot push the encoder's per-frame representation toward the clean one by enough to matter, and giving it the capacity to do so (encoder FFN) overfits the 2400-utterance pool instead. The error is correctly localized to the encoder, but it is not fixable by recipe changes on this data: it is an information/data-scale limit. The decisive next lever is more/real degraded training data, not another loss term or target-set edit.

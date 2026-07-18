@@ -1,0 +1,57 @@
+run_id: pilot_ajk_combined_150
+hypothesis: 'Combine the two: feature distillation provides a better training signal
+  (make degraded features match clean) and encoder-FFN LoRA provides the capacity
+  to act on it. Either alone may be signal-limited or capacity-limited respectively;
+  together they target the acoustic bottleneck from both sides.'
+starting_checkpoint: efficient-speech/lite-whisper-large-v3-turbo-acc
+changed_variable: Pilot X recipe plus BOTH feature_distill_weight=1.0 (high/mid/low)
+  AND encoder fc1/fc2 added to the LoRA target set.
+control_run: pilot_x_decoder_cross_attn_lr5e6_150, pilot_q_consistency (pooled-consistency
+  precursor), and baseline_tuning_dev_decode_ng3_proxy
+promotion_criterion: Tuning-dev no-repeat-3 Avg improves >=2%, combined mid/low improves
+  >=5% relative, dry regression <=0.7, catastrophic rate does not increase.
+seed: 1337
+model: {id: efficient-speech/lite-whisper-large-v3-turbo-acc, revision: ef2c0dd768cc9832a8a5a3397ab7218c838fea66,
+  processor_id: openai/whisper-large-v3, dtype: float16, device: cuda}
+labels: {language: en, task: transcribe, predict_timestamps: false}
+train_manifest: artifacts/manifests/librispeech_train_clean_diag/manifest.jsonl
+output_dir: artifacts/runs/pilot_ajk_combined_150
+max_updates: 150
+max_wall_time_minutes: 45
+micro_batch_size: 1
+grad_accumulation: 8
+learning_rate: 5.0e-06
+weight_decay: 0.0
+gradient_clip_norm: 1.0
+checkpoint_steps: [75, 100, 150]
+loss:
+  clean_ce_weight: 1.0
+  normalize_clean_anchor: true
+  feature_distill_weight: 1.0
+  feature_distill_conditions: [high, mid, low]
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_name_regex: [model\.encoder\.layers\..*\.self_attn\.(q_proj|v_proj|out_proj)$,
+    model\.decoder\.layers\..*\.encoder_attn\.(q_proj|v_proj|out_proj)$, model\.encoder\.layers\..*\.(fc1|fc2)$]
+augmentation:
+  condition_distribution: {dry: 0.35, high: 0.35, mid: 0.2, low: 0.1}
+  snr_db:
+    high: [16.0, 25.0]
+    mid: [10.0, 14.0]
+    low: [3.0, 8.0]
+  curriculum:
+  - until_update: 50
+    condition_distribution: {dry: 0.35, high: 0.35, mid: 0.2, low: 0.1}
+    snr_db:
+      high: [16.0, 25.0]
+      mid: [10.0, 14.0]
+      low: [3.0, 8.0]
+  - until_update: null
+    condition_distribution: {dry: 0.25, high: 0.25, mid: 0.3, low: 0.2}
+    snr_db:
+      high: [14.0, 25.0]
+      mid: [8.0, 13.0]
+      low: [0.0, 6.0]
+resources: {expected_vram: 12-20 GB, expected_disk_usage: <0.3 GB adapter/logs, max_project_gb: 48}

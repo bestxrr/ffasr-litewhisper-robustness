@@ -156,11 +156,34 @@ def make_labels(processor, text: str, device: str, label_cfg: dict) -> torch.Ten
     return labels.to(device=device)
 
 
-def pooled_encoder_state(encoder_last_hidden_state: torch.Tensor, audio_num_samples: int, sr: int) -> torch.Tensor:
+def _valid_frame_count(max_frames: int, audio_num_samples: int, sr: int) -> int:
     # Whisper's encoder produces 50 frames/s after the convolutional frontend.
-    max_frames = encoder_last_hidden_state.shape[1]
-    valid_frames = max(1, min(max_frames, int(np.ceil(audio_num_samples / sr * 50.0))))
+    return max(1, min(max_frames, int(np.ceil(audio_num_samples / sr * 50.0))))
+
+
+def pooled_encoder_state(encoder_last_hidden_state: torch.Tensor, audio_num_samples: int, sr: int) -> torch.Tensor:
+    valid_frames = _valid_frame_count(encoder_last_hidden_state.shape[1], audio_num_samples, sr)
     return encoder_last_hidden_state[:, :valid_frames, :].mean(dim=1)
+
+
+def encoder_valid_frames(encoder_last_hidden_state: torch.Tensor, audio_num_samples: int, sr: int) -> torch.Tensor:
+    valid_frames = _valid_frame_count(encoder_last_hidden_state.shape[1], audio_num_samples, sr)
+    return encoder_last_hidden_state[:, :valid_frames, :]
+
+
+def frame_distillation_loss(degraded_frames: torch.Tensor, clean_frames: torch.Tensor) -> torch.Tensor:
+    """Per-frame cosine distance between the degraded and (detached, teacher) clean encoder
+    representations. Pilot Q pooled the frames into a single mean vector before comparing, which
+    averages away exactly the per-frame acoustic detail that degradation destroys; matching every
+    frame instead pushes the degraded encoder output toward the clean one where the information
+    was actually lost. Frames are index-aligned and truncated to the shorter valid-frame count."""
+    t = min(degraded_frames.shape[1], clean_frames.shape[1])
+    if t < 1:
+        return degraded_frames.new_zeros(())
+    deg = degraded_frames[:, :t, :].float()
+    clean = clean_frames[:, :t, :].detach().float()
+    cos = F.cosine_similarity(F.normalize(deg, dim=-1), F.normalize(clean, dim=-1), dim=-1)
+    return (1.0 - cos).mean()
 
 
 def loss_for_audio(
@@ -171,25 +194,25 @@ def loss_for_audio(
     labels: torch.Tensor,
     device: str,
     dtype: torch.dtype,
-    return_encoder_pool: bool = False,
-    return_logits: bool = False,
-) -> torch.Tensor | tuple[torch.Tensor, ...]:
+    want: tuple[str, ...] = (),
+) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
     inputs = processor(audio, sampling_rate=sr, return_tensors="pt")
     input_features = inputs.input_features.to(device=device, dtype=dtype)
+    need_encoder = ("pool" in want) or ("frames" in want)
     out = model(
         input_features=input_features,
         labels=labels,
-        output_hidden_states=return_encoder_pool,
+        output_hidden_states=need_encoder,
         return_dict=True,
     )
-    extras: list[torch.Tensor] = []
-    if return_encoder_pool:
-        extras.append(pooled_encoder_state(out.encoder_last_hidden_state, len(audio), sr))
-    if return_logits:
-        extras.append(out.logits)
-    if not extras:
-        return out.loss
-    return (out.loss, *extras)
+    extras: dict[str, torch.Tensor] = {}
+    if "pool" in want:
+        extras["pool"] = pooled_encoder_state(out.encoder_last_hidden_state, len(audio), sr)
+    if "frames" in want:
+        extras["frames"] = encoder_valid_frames(out.encoder_last_hidden_state, len(audio), sr)
+    if "logits" in want:
+        extras["logits"] = out.logits
+    return out.loss, extras
 
 
 def eos_suppression_penalty(logits: torch.Tensor, labels: torch.Tensor, eos_token_id: int) -> torch.Tensor:
@@ -285,6 +308,9 @@ def main() -> None:
     eos_suppress_conditions = cfg.get("loss", {}).get("eos_suppress_conditions")
     eos_suppress_conditions = set(eos_suppress_conditions) if eos_suppress_conditions else None
     eos_token_id = processor.tokenizer.eos_token_id
+    feature_distill_weight = float(cfg.get("loss", {}).get("feature_distill_weight", 0.0))
+    feature_distill_conditions = cfg.get("loss", {}).get("feature_distill_conditions")
+    feature_distill_conditions = set(feature_distill_conditions) if feature_distill_conditions else None
     label_cfg = cfg.get("labels", {})
     checkpoint_steps = {int(s) for s in cfg.get("checkpoint_steps", [])}
     max_updates = int(cfg["max_updates"])
@@ -297,6 +323,7 @@ def main() -> None:
     running_clean = 0.0
     running_consistency = 0.0
     running_eos_penalty = 0.0
+    running_feature_distill = 0.0
     consistency_weight = float(cfg.get("loss", {}).get("consistency_weight", 0.0))
     with open(log_path, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(
@@ -308,6 +335,7 @@ def main() -> None:
                 "clean_ce",
                 "consistency",
                 "eos_penalty",
+                "feature_distill",
                 "grad_norm",
                 "condition",
                 "condition_weight",
@@ -332,57 +360,58 @@ def main() -> None:
                 labels = make_labels(processor, row["text"], device, label_cfg)
                 condition_weight = float(condition_ce_weights.get(condition, 1.0))
                 with torch.amp.autocast("cuda", enabled=(device == "cuda"), dtype=torch.float16):
-                    need_pool = consistency_weight > 0
                     apply_eos_suppress = eos_suppress_weight > 0 and (
                         eos_suppress_conditions is None or condition in eos_suppress_conditions
                     )
-                    need_logits = apply_eos_suppress
-                    degraded_out = loss_for_audio(
-                        model, processor, audio, sr, labels, device, dtype,
-                        return_encoder_pool=need_pool, return_logits=need_logits,
+                    apply_feature_distill = feature_distill_weight > 0 and (
+                        feature_distill_conditions is None or condition in feature_distill_conditions
                     )
-                    degraded_logits = None
-                    if need_pool and need_logits:
-                        degraded_loss, degraded_pool, degraded_logits = degraded_out
-                    elif need_pool:
-                        degraded_loss, degraded_pool = degraded_out
-                    elif need_logits:
-                        degraded_loss, degraded_logits = degraded_out
-                    else:
-                        degraded_loss = degraded_out
+                    deg_want: list[str] = []
+                    if consistency_weight > 0:
+                        deg_want.append("pool")
+                    if apply_feature_distill:
+                        deg_want.append("frames")
+                    if apply_eos_suppress:
+                        deg_want.append("logits")
+                    degraded_loss, degraded_extras = loss_for_audio(
+                        model, processor, audio, sr, labels, device, dtype, want=tuple(deg_want),
+                    )
                     clean_loss = torch.zeros_like(degraded_loss)
                     consistency_loss = torch.zeros_like(degraded_loss)
                     eos_penalty = torch.zeros_like(degraded_loss)
-                    if need_logits:
-                        eos_penalty = eos_suppression_penalty(degraded_logits, labels, eos_token_id)
+                    feature_distill_loss = torch.zeros_like(degraded_loss)
+                    if apply_eos_suppress:
+                        eos_penalty = eos_suppression_penalty(degraded_extras["logits"], labels, eos_token_id)
                     loss = condition_weight * degraded_loss
-                    if clean_ce_weight > 0 or consistency_weight > 0:
-                        clean_out = loss_for_audio(
-                            model,
-                            processor,
-                            clean_audio,
-                            sr,
-                            labels,
-                            device,
-                            dtype,
-                            return_encoder_pool=need_pool,
+                    if clean_ce_weight > 0 or consistency_weight > 0 or apply_feature_distill:
+                        clean_want: list[str] = []
+                        if consistency_weight > 0:
+                            clean_want.append("pool")
+                        if apply_feature_distill:
+                            clean_want.append("frames")
+                        clean_loss, clean_extras = loss_for_audio(
+                            model, processor, clean_audio, sr, labels, device, dtype, want=tuple(clean_want),
                         )
-                        if need_pool:
-                            clean_loss, clean_pool = clean_out
+                        if consistency_weight > 0:
                             consistency_loss = 1.0 - F.cosine_similarity(
-                                F.normalize(degraded_pool.float(), dim=-1),
-                                F.normalize(clean_pool.detach().float(), dim=-1),
+                                F.normalize(degraded_extras["pool"].float(), dim=-1),
+                                F.normalize(clean_extras["pool"].detach().float(), dim=-1),
                                 dim=-1,
                             ).mean()
-                        else:
-                            clean_loss = clean_out
-                        loss = condition_weight * degraded_loss + clean_ce_weight * clean_loss
-                        if normalize_clean_anchor:
-                            loss = loss / (condition_weight + clean_ce_weight)
+                        if apply_feature_distill:
+                            feature_distill_loss = frame_distillation_loss(
+                                degraded_extras["frames"], clean_extras["frames"]
+                            )
+                        if clean_ce_weight > 0:
+                            loss = condition_weight * degraded_loss + clean_ce_weight * clean_loss
+                            if normalize_clean_anchor:
+                                loss = loss / (condition_weight + clean_ce_weight)
                     if consistency_weight > 0:
                         loss = loss + consistency_weight * consistency_loss
                     if apply_eos_suppress:
                         loss = loss + eos_suppress_weight * eos_penalty
+                    if apply_feature_distill:
+                        loss = loss + feature_distill_weight * feature_distill_loss
                     loss = loss / accum
                 if not torch.isfinite(loss):
                     raise RuntimeError(f"Non-finite loss at update {update}: {loss}")
@@ -392,6 +421,7 @@ def main() -> None:
                 running_clean += float(clean_loss.detach().cpu()) if clean_ce_weight > 0 else 0.0
                 running_consistency += float(consistency_loss.detach().cpu()) if consistency_weight > 0 else 0.0
                 running_eos_penalty += float(eos_penalty.detach().cpu()) if apply_eos_suppress else 0.0
+                running_feature_distill += float(feature_distill_loss.detach().cpu()) if apply_feature_distill else 0.0
             scaler.unscale_(opt)
             health = gradient_health(model)
             if health["bad_gradients"]:
@@ -411,11 +441,13 @@ def main() -> None:
             mean_clean = running_clean / accum if clean_ce_weight > 0 else 0.0
             mean_consistency = running_consistency / accum if consistency_weight > 0 else 0.0
             mean_eos_penalty = running_eos_penalty / accum if eos_suppress_weight > 0 else 0.0
+            mean_feature_distill = running_feature_distill / accum if feature_distill_weight > 0 else 0.0
             running = 0.0
             running_deg = 0.0
             running_clean = 0.0
             running_consistency = 0.0
             running_eos_penalty = 0.0
+            running_feature_distill = 0.0
             writer.writerow({
                 "update": update,
                 "loss": mean_loss,
@@ -423,6 +455,7 @@ def main() -> None:
                 "clean_ce": mean_clean,
                 "consistency": mean_consistency,
                 "eos_penalty": mean_eos_penalty,
+                "feature_distill": mean_feature_distill,
                 "grad_norm": float(grad_norm.detach().cpu()),
                 "condition": last_condition,
                 "condition_weight": float(condition_ce_weights.get(last_condition, 1.0)),
